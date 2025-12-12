@@ -15,6 +15,8 @@ type TomlParams struct {
 
 var params *TomlParams
 
+var inputStruct any // 解析到的toml之后存放在这个结构体中
+
 var tomlCmd = &cobra.Command{
 	Use:   "toml",
 	Short: "toml parse tools",
