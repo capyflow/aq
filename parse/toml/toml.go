@@ -1,22 +1,20 @@
-package parse
+package toml
 
-// Package toml implements a production-grade TOML parser with a strong
-// internal AST, deterministic semantics, and safe post-parse operations.
+// toml 包实现了一个生产级的 TOML 解析器，具有强大的内部 AST、确定性语义和安全的解析后操作。
 //
-// Scope:
-// - TOML v1.0.0 core features
-// - Explicit AST (Table / Array / Value)
-// - Safe dotted-key handling
-// - Table extension semantics
-// - Deterministic errors
+// 范围：
+// - TOML v1.0.0 核心功能
+// - 显式 AST（表 / 数组 / 值）
+// - 安全的点分键处理
+// - 表扩展语义
+// - 确定性错误
 //
-// Non-goals (by design):
-// - Comment preservation
-// - Formatting round-trip
-// - Streaming mutation
+// 非目标（设计如此）：
+// - 注释保留
+// - 格式化往返
+// - 流式突变
 //
-// This implementation is suitable for production use as a configuration
-// ingestion layer.
+// 此实现适用于生产环境，作为配置摄取层。
 
 import (
 	"bufio"
@@ -88,7 +86,7 @@ func (*Value) Kind() Kind { return KindValue }
 // =========================
 
 // Parse parses TOML input from r and returns a root Table.
-func ParseToml(r io.Reader) (*Table, error) {
+func Parse(r io.Reader) (*Table, error) {
 	p := &parser{
 		scanner: bufio.NewScanner(r),
 		root:    NewTable(),
@@ -97,9 +95,11 @@ func ParseToml(r io.Reader) (*Table, error) {
 	p.cur = p.root
 
 	for p.scanner.Scan() {
+		// 逐行读取toml
 		line := strings.TrimSpace(p.scanner.Text())
 		p.lineNo++
 
+		// 跳过空行和注释行
 		if line == "" || strings.HasPrefix(line, "#") {
 			continue
 		}
@@ -143,6 +143,7 @@ func (p *parser) parseTableHeader(line string) error {
 	t := p.root
 	for _, part := range parts {
 		n, ok := t.Items[part]
+		// 如果键不存在，创建一个新表
 		if !ok {
 			next := NewTable()
 			t.Items[part] = next
