@@ -115,5 +115,6 @@ ports = [
 		convey.So(len(arr), convey.ShouldEqual, 2)
 		convey.So(arr[0], convey.ShouldEqual, int64(8001))
 		convey.So(arr[1], convey.ShouldEqual, int64(8002))
+		t.Logf("%v", n)
 	})
 }
